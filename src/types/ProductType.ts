@@ -1,19 +1,22 @@
+// ---------- Server types ----------
 export type Product = {
   id: string;
   companyId: string;
   name: string;
   unit: string;
   cost: number;
+  category:string
 };
 
+// ---------- Forms types ----------
 export type NewProduct = Omit<Product, "id">;
 
 export type ProductFormValues = Omit<NewProduct, "cost"> & {
   cost: number | "";
 };
 
-
-export type ModalState =
+// ---------- Props and modal state types ----------
+export type ProductModalState =
   | { mode: "closed" }
   | { mode: "create" }
   | { mode: "edit"; product: Product };

@@ -1,1 +1,380 @@
 @import "tailwindcss";
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-slate-50 font-sans text-slate-900 antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid #ea580c;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---------- General layout
+ ---------- */
+  .app-shell {
+    @apply flex min-h-screen flex-col;
+  }
+
+  .app-main {
+    @apply mx-auto w-full max-w-6xl flex-1 px-4 py-8;
+  }
+
+  /* ---------- Internal page navigation ---------- */
+  .app-header {
+    @apply sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-sm;
+  }
+
+  .app-header__inner {
+    @apply mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3;
+  }
+
+  .brand {
+    @apply text-lg font-bold tracking-tight text-orange-600;
+  }
+
+  .nav-list {
+    @apply flex flex-wrap items-center gap-1;
+  }
+
+  .nav-link {
+    @apply rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900;
+  }
+
+  .nav-link--active {
+    @apply bg-orange-50 text-orange-700 hover:bg-orange-50 hover:text-orange-700;
+  }
+
+  /* ---------- Home ---------- */
+  .home {
+    @apply flex min-h-screen items-center justify-center px-4 py-12;
+  }
+
+  .home__card {
+    @apply w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm;
+  }
+
+  .home__title {
+    @apply text-2xl font-bold tracking-tight text-slate-900;
+  }
+
+  .home__subtitle {
+    @apply mt-1 text-sm text-slate-500;
+  }
+
+  .home__nav {
+    @apply mt-6 flex flex-col gap-3;
+  }
+
+  .home__link {
+    @apply flex items-center justify-between rounded-lg border border-slate-200 bg-white px-5 py-4 font-medium text-slate-800 shadow-sm transition hover:border-orange-300 hover:text-orange-700 hover:shadow-md;
+  }
+
+  .home__arrow {
+    @apply text-orange-600;
+  }
+
+  /* ---------- Pages (header, search, status) ---------- */
+  .page {
+    @apply flex flex-col gap-6;
+  }
+
+  .page__header {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .page__title {
+    @apply text-2xl font-bold tracking-tight text-slate-900;
+  }
+
+  .page__subtitle {
+    @apply mt-1 text-sm text-slate-500;
+  }
+
+  .search {
+    @apply w-full sm:max-w-sm flex flex-row;
+  }
+
+  .status-text {
+    @apply min-h-[1.25rem] text-sm text-slate-500;
+  }
+
+  .alert {
+    @apply rounded-md border px-4 py-3 text-sm;
+  }
+
+  .alert--error {
+    @apply border-red-200 bg-red-50 text-red-700;
+  }
+
+  .empty-state {
+    @apply rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-sm text-slate-500;
+  }
+
+  /* ---------- Cards ---------- */
+  .card-grid {
+    @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .card {
+    @apply flex flex-col justify-between gap-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md;
+  }
+
+  .card__body {
+    @apply flex flex-col gap-1;
+  }
+
+  .card__header {
+    @apply mb-2 flex items-start justify-between gap-3;
+  }
+
+  .card__title {
+    @apply text-base font-semibold text-slate-900;
+  }
+
+  .card__label {
+    @apply text-xs font-medium uppercase tracking-wide text-slate-500;
+  }
+
+  .card__price {
+    @apply text-xl font-bold text-slate-900;
+  }
+
+  .card__value {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .card__actions {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn--sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn--primary {
+    @apply bg-orange-600 text-white enabled:hover:bg-orange-700;
+  }
+
+  .btn--secondary {
+    @apply border border-slate-300 bg-white text-slate-700 enabled:hover:bg-slate-50;
+  }
+
+  .btn--danger {
+    @apply border border-red-200 bg-white text-red-600 enabled:hover:bg-red-50;
+  }
+
+  .btn--ghost {
+    @apply text-orange-700 enabled:hover:bg-orange-50;
+  }
+
+  /* ---------- Forms ---------- */
+  .form {
+    @apply flex flex-col gap-4;
+  }
+
+  .form-grid {
+    @apply grid gap-4 sm:grid-cols-2;
+  }
+
+  .form-grid__full {
+    @apply sm:col-span-2;
+  }
+
+  .field {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .label {
+    @apply text-sm font-medium text-slate-700;
+  }
+
+  .input {
+    @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200;
+  }
+
+  .textarea {
+    @apply min-h-[7rem] resize-y;
+  }
+
+  .field-error {
+    @apply text-xs font-medium text-red-600;
+  }
+
+  /* ---------- Modal sections ---------- */
+  .section {
+    @apply flex flex-col gap-3;
+  }
+
+  .section__header {
+    @apply flex items-center justify-between gap-3;
+  }
+
+  .section__title {
+    @apply text-sm font-semibold uppercase tracking-wide text-slate-500 pt-5;
+  }
+
+  .items-list {
+    @apply flex flex-col gap-3;
+  }
+
+  .item-row {
+    @apply grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_9rem_auto] sm:items-start;
+  }
+
+  .item-row__remove {
+    @apply sm:mt-7;
+  }
+
+  .prose-text {
+    @apply whitespace-pre-line text-sm leading-relaxed text-slate-700;
+  }
+
+  /* ---------- Tech data sheet view modal ---------- */
+  .summary {
+    @apply grid grid-cols-2 gap-4 rounded-lg bg-slate-50 p-4;
+  }
+
+  .summary__label {
+    @apply text-xs font-medium uppercase tracking-wide text-slate-500;
+  }
+
+  .summary__value {
+    @apply mt-1 text-lg font-bold text-slate-900;
+  }
+
+  /* ---------- Table ---------- */
+  .table-wrapper {
+    @apply overflow-x-auto rounded-lg border border-slate-200;
+  }
+
+  .table {
+    @apply w-full text-left text-sm;
+  }
+
+  .table th {
+    @apply border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500;
+  }
+
+  .table td {
+    @apply border-b border-slate-100 px-4 py-3 text-slate-700;
+  }
+
+  .table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .table__num {
+    @apply text-right tabular-nums;
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm;
+  }
+
+  .modal {
+    @apply flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-xl focus:outline-none;
+  }
+
+  .modal--lg {
+    @apply max-w-2xl;
+  }
+
+  .modal__header {
+    @apply flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-4;
+  }
+
+  .modal__title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .modal__close {
+    @apply cursor-pointer rounded-md px-2 py-1 text-xl leading-none text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900;
+  }
+
+  .modal__body {
+    @apply flex flex-col gap-4 overflow-y-auto px-6 py-5;
+  }
+
+  .modal__footer {
+    @apply mt-2 flex justify-end gap-2 border-t border-slate-200 pt-4;
+  }
+}
+
+/* ---------- Print to PDF ---------- */
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible !important;
+  }
+
+  .print-area {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    padding: 20px;
+    background: white;
+    color: black;
+    overflow: visible;
+  }
+
+  .print-area table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .print-area tr {
+    break-inside: avoid;
+  }
+
+  .print-area th,
+  .print-area td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .print-area .table__num {
+    text-align: right;
+  }
+
+  .print-area .section {
+    break-inside: avoid;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+}

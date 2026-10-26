@@ -12,65 +12,138 @@
     {
       "companyId": "1",
       "name": "Cebola",
-      "unit": "kg",
-      "cost": 5,
-      "id": "4feP1tPXrGo"
+      "unit": "KG",
+      "cost": 5.5,
+      "id": "WEzEPacSFXc",
+      "category": "Hortifruti"
     },
     {
       "companyId": "1",
-      "name": "aRRoz",
+      "name": "Arroz branco",
+      "unit": "KG",
+      "cost": 5,
+      "id": "GtHK8fOQYgA",
+      "category": "Grãos e Cereais"
+    },
+    {
+      "companyId": "1",
+      "name": "Alho",
+      "unit": "KG",
+      "cost": 11,
+      "id": "9beEqS6fJ4s",
+      "category": "Hortifruti"
+    },
+    {
+      "companyId": "1",
+      "name": "Feijao",
+      "unit": "KG",
+      "cost": 8,
+      "id": "_P2MqZCMo7Q",
+      "category": "Grãos e Cereais"
+    },
+    {
+      "companyId": "1",
+      "name": "Calabresa",
+      "unit": "KG",
+      "cost": 7,
+      "id": "Jv1lBJYkMlk",
+      "category": "Proteínas"
+    },
+    {
+      "companyId": "1",
+      "name": "Agua",
+      "unit": "L",
+      "cost": 2.5,
+      "id": "nEAP3Bvpt68",
+      "category": "Bebidas"
+    },
+    {
+      "companyId": "1",
+      "name": "Polpa de manga",
+      "unit": "KG",
+      "cost": 7,
+      "id": "_Ze4ikbG59U",
+      "category": "Polpas de Frutas"
+    },
+    {
+      "companyId": "1",
+      "name": "Açucar",
       "unit": "KG",
       "cost": 3,
-      "id": "Plqo2k-Ye0Y"
+      "id": "T59b7NY7oh0",
+      "category": "Açúcares e Adoçantes"
     },
     {
       "companyId": "1",
-      "name": "Laranja",
-      "unit": "kh",
-      "cost": 4,
-      "id": "IXexqhH9mtM"
-    },
-    {
-      "companyId": "1",
-      "name": "Cebolabb",
-      "unit": "CX",
+      "name": "Alface",
+      "unit": "UN",
       "cost": 5,
-      "id": "w6MTb5A1ZyY"
-    },
-    {
-      "companyId": "1",
-      "name": "Cenoura",
-      "unit": "KG",
-      "cost": 5,
-      "id": "1XmAbOe9REs"
+      "category": "Açúcares e Adoçantes",
+      "id": "mKjnTL4mYGk"
     }
   ],
   "techDataSheets": [
     {
-      "id": "1",
       "companyId": "1",
-      "name": "Frango com arroz e feijão",
-      "yield": 1
+      "name": "Arroz",
+      "yield": 2.5,
+      "yieldUnity": "KG",
+      "obs": "1. Separe e meça os ingredientes conforme a quantidade desejada.\n2. Em uma panela, aqueça o óleo e refogue o alho picado até dourar levemente.\n3. Adicione o arroz e refogue por aproximadamente 2 minutos, mexendo para envolver os grãos no tempero.\n4. Acrescente a água quente e o sal, misturando para distribuir os ingredientes.\n5. Cozinhe em fogo médio até a água começar a baixar. Em seguida, reduza o fogo e tampe parcialmente a panela.\n6. Deixe cozinhar até que a água seja completamente absorvida e os grãos estejam macios.\n7. Desligue o fogo, tampe a panela e deixe o arroz descansar por cerca de 5 minutos.\n8. Solte os grãos delicadamente com um garfo e sirva.",
+      "prepTime": 20,
+      "category": "Acompanhamento",
+      "creationDate": "2026-10-26T18:32:26.962Z",
+      "lastRevision": "2026-10-26T18:32:26.962Z",
+      "id": "UhA5n3tKCHs"
+    },
+    {
+      "companyId": "1",
+      "name": "Suco de manga",
+      "yield": 3,
+      "yieldUnity": "L",
+      "obs": "Modo de preparo — Suco de manga com polpa\n\n1. Separe a polpa de manga congelada, a água filtrada e o açúcar, caso necessário.\n2. Coloque a polpa e a água no liquidificador, respeitando a proporção indicada para a quantidade desejada.\n3. Bata por aproximadamente 1 a 2 minutos, até obter uma mistura homogênea.\n4. Prove e, se necessário, adicione açúcar e bata novamente até dissolver.\n5. Sirva imediatamente, preferencialmente gelado.\n\nObservação: ajuste a quantidade de água conforme a concentração desejada para o suco.",
+      "prepTime": 5,
+      "category": "Suco",
+      "creationDate": "2026-10-26T18:37:22.574Z",
+      "lastRevision": "2026-10-26T18:39:48.336Z",
+      "id": "1S1YZJxhEJ4"
     }
   ],
   "itemDetails": [
     {
-      "id": "1",
-      "techDataSheetsId": "1",
-      "productId": null,
-      "quantity": 0.5
+      "techDataSheetsId": "UhA5n3tKCHs",
+      "productId": "GtHK8fOQYgA",
+      "quantity": 1,
+      "id": "cVuFeandRHE"
     },
     {
-      "id": "2",
-      "techDataSheetsId": "1",
-      "productId": null,
-      "quantity": 0.1
+      "techDataSheetsId": "UhA5n3tKCHs",
+      "productId": "WEzEPacSFXc",
+      "quantity": 0.5,
+      "id": "fy4BuyNaFgY"
     },
     {
-      "id": "3",
-      "techDataSheetsId": "1",
-      "productId": null,
-      "quantity": 0.2
+      "techDataSheetsId": "UhA5n3tKCHs",
+      "productId": "9beEqS6fJ4s",
+      "quantity": 0.05,
+      "id": "JeHa0AJgKqU"
+    },
+    {
+      "techDataSheetsId": "1S1YZJxhEJ4",
+      "productId": "nEAP3Bvpt68",
+      "quantity": 1,
+      "id": "dO-C7070p4A"
+    },
+    {
+      "techDataSheetsId": "1S1YZJxhEJ4",
+      "productId": "_Ze4ikbG59U",
+      "quantity": 1,
+      "id": "_JOnGR95Knc"
+    },
+    {
+      "techDataSheetsId": "1S1YZJxhEJ4",
+      "productId": "T59b7NY7oh0",
+      "quantity": 0.5,
+      "id": "wGO9821HtgA"
     }
   ],
   "menus": [

@@ -5,9 +5,11 @@ import type {
   NewProduct,
   ProductFormValues,
 } from "../types/productType";
-import { validationSchema } from "../validation/productSchema";
+import { validationProductSchema } from "../validation/productSchema";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { unitOptions } from "../constants/unitOptions";
+import { productCategoryOption } from "../constants/productCategoryOption";
+import { Modal } from "./Modal";
 
 export const ProductModal = ({
   onClose,
@@ -17,18 +19,19 @@ export const ProductModal = ({
 }: ProductModalProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // INITIAL VALUES
+  // ------------- Initial values -------------
   const initialValues: ProductFormValues =
     mode === "create"
-      ? { companyId: "1", name: "", unit: "", cost: "" }
+      ? { companyId: "1", name: "", unit: "", cost: "", category: "" }
       : {
           companyId: product.companyId,
           name: product.name,
           unit: product.unit,
           cost: product.cost,
+          category: product.category,
         };
 
-  // HANDLE SUBMIT
+  // ------------- Handle submit -------------
   const handleSubmit = async (values: ProductFormValues) => {
     setSubmitError(null);
 
@@ -53,25 +56,39 @@ export const ProductModal = ({
       );
     }
   };
-  // RENDER
+
+  // ------------- Render -------------
   return (
-    <div>
-      {mode === "create" ? <h1>Cadastrar item</h1> : <h1>Editar item</h1>}
-      {submitError && <p className="text-red-500">{submitError}</p>}
+    <Modal
+      title={mode === "create" ? "Cadastrar produto" : "Editar produto"}
+      onClose={onClose}
+    >
+      {submitError && (
+        <p role="alert" className="alert alert--error">
+          {submitError}
+        </p>
+      )}
+
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        validationSchema={validationProductSchema}
         onSubmit={handleSubmit}
       >
         {({ isSubmitting, dirty }) => (
-          <Form>
-            <div className="flex flex-col gap-4">
-              <label htmlFor="name">Nome</label>
-              <Field name="name" id="name" type="text" />
-              <ErrorMessage name="name" />
+          <Form className="form">
+            <div className="field">
+              <label htmlFor="name" className="label">
+                Nome
+              </label>
+              <Field name="name" id="name" type="text" className="input" />
+              <ErrorMessage name="name" component="p" className="field-error" />
+            </div>
 
-              <label htmlFor="unit">Unidade</label>
-              <Field as="select" name="unit" id="unit">
+            <div className="field">
+              <label htmlFor="unit" className="label">
+                Unidade
+              </label>
+              <Field as="select" name="unit" id="unit" className="input">
                 <option value="">Selecione uma unidade</option>
                 {unitOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -79,33 +96,54 @@ export const ProductModal = ({
                   </option>
                 ))}
               </Field>
-
-              <ErrorMessage name="unit" />
-
-              <label htmlFor="cost">Custo</label>
-              <Field name="cost" id="cost" type="number" />
-              <ErrorMessage name="cost" />
+              <ErrorMessage name="unit" component="p" className="field-error" />
             </div>
 
-            <button
-              className=" cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-              type="submit"
-              disabled={isSubmitting || !dirty}
-            >
-              {mode === "create" ? "Cadastrar" : "Salvar"}
-            </button>
-            <button
-              className="cursor-pointer"
-              type="button"
-              onClick={() => {
-                onClose();
-              }}
-            >
-              X
-            </button>
+            <div className="field">
+              <label htmlFor="cost" className="label">
+                Custo
+              </label>
+              <Field name="cost" id="cost" type="number" className="input" />
+              <ErrorMessage name="cost" component="p" className="field-error" />
+            </div>
+             <div className="field">
+              <label htmlFor="category" className="label">
+                Categoria
+              </label>
+              <Field as="select" name="category" id="category" className="input">
+                <option value="">Selecione uma categoria</option>
+                {productCategoryOption.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </Field>
+              <ErrorMessage name="unit" component="p" className="field-error" />
+            </div>
+
+            <div className="modal__footer">
+              <button
+                type="button"
+                className="btn btn--secondary"
+                onClick={() => onClose()}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={isSubmitting || !dirty}
+              >
+                {isSubmitting
+                  ? "Salvando..."
+                  : mode === "create"
+                    ? "Cadastrar"
+                    : "Salvar"}
+              </button>
+            </div>
           </Form>
         )}
       </Formik>
-    </div>
+    </Modal>
   );
 };

@@ -3,11 +3,11 @@ import NavPages from "../components/NavPages";
 
 export const MainLayout = () => {
   return (
-    <>
+    <div className="app-shell">
       <NavPages />
-      <main className="p-6">
+      <main id="conteudo" className="app-main">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 };

@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { deleteProduct, searchProducts } from "../api/productsApi";
-import { ProductModal } from "../components/ProductModal";
-import type {
-  Product,
-  ModalState,
-} from "../types/productType";
 
-import type { RequestState } from "../types/shareTypes";
+import { getDataSheetItems } from "../api/techDataSheetApi";
+import { ProductModal } from "../components/ProductModal";
+import type { Product, ProductModalState } from "../types/productType";
+
+import type { RequestState } from "../types/sharedTypes";
 
 export const Products = () => {
   const [search, setSearch] = useState("");
@@ -15,9 +14,9 @@ export const Products = () => {
   });
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [modal, setModal] = useState<ModalState>({ mode: "closed" });
+  const [modal, setModal] = useState<ProductModalState>({ mode: "closed" });
 
-  // SHOW PRODUCTS
+  // ------------- Show products -------------
   useEffect(() => {
     setResponse({ status: "loading" });
     setDeleteError(null);
@@ -52,7 +51,7 @@ export const Products = () => {
     };
   }, [search]);
 
-  // DELETE PRODUCTS
+  // ------------- Delete products -------------
   const handleDelete = async (id: string) => {
     if (response.status !== "success") return;
 
@@ -70,6 +69,13 @@ export const Products = () => {
     setDeletingId(id);
 
     try {
+      const itemsDetails = await getDataSheetItems();
+      const usedProduct = itemsDetails.find((item) => item.productId === id);
+
+      if (usedProduct) {
+        throw new Error("O produto esta sendo usado por uma ficha tecnica");
+      }
+
       await deleteProduct(id);
       setResponse((prev) => {
         if (prev.status === "success") {
@@ -82,23 +88,25 @@ export const Products = () => {
       });
     } catch (error) {
       console.error(error);
-      setDeleteError("Erro ao excluir produto");
+      if (error instanceof Error) {
+        setDeleteError(error.message);
+      } else {
+        setDeleteError("Erro ao excluir produto");
+      }
     } finally {
       setDeletingId(null);
     }
   };
 
-  // SHOW MESSAGES
+  // ------------- Show status messages -------------
   const getStatusMessage = () => {
     if (response.status === "loading") return "Buscando...";
-    if (response.status === "error") return response.error;
-    if (response.status === "success")
-      return response.data.length === 0
-        ? "Nenhum produto encontrado"
-        : `Total de produtos encontrados: ${response.data.length}`;
+    if (response.status === "success" && response.data.length > 0)
+      return `Total de produtos encontrados: ${response.data.length}`;
+    return null;
   };
 
-  // HANDLE NEW PRODUCT
+  // ------------- Handle new product -------------
   const handleProductCreated = (newProduct: Product) => {
     setResponse((prev) => {
       if (prev.status === "success") {
@@ -112,7 +120,7 @@ export const Products = () => {
     setSearch("");
   };
 
-  // HANDLE EDIT PRODUCT
+  // ------------- Handle edit products -------------
   const handleProductUpdated = (updatedProduct: Product) => {
     setResponse((prev) => {
       if (prev.status === "success") {
@@ -127,60 +135,110 @@ export const Products = () => {
     });
   };
 
-  // RENDER
+  // ------------- Render -------------
   return (
-    <>
-      <div className="flex flex-col gap-2 p-4 self-center">
+    <div className="page">
+      <header className="page__header">
+        <div>
+          <h1 className="page__title">Produtos</h1>
+          <p className="page__subtitle">
+            Cadastre os insumos usados nas fichas técnicas.
+          </p>
+        </div>
         <button
+          type="button"
+          className="btn btn--primary"
           onClick={() => setModal({ mode: "create" })}
-          className="cursor-pointer "
         >
           Cadastrar novo produto
         </button>
-        <label htmlFor="search">Buscar produtos</label>
+      </header>
+
+      <div className="field search">
+        <label htmlFor="search" className="label">
+          Buscar produtos
+        </label>
         <input
           type="text"
           id="search"
+          className="input"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Digite o nome do produto"
+          placeholder="Digite o nome do produto ou categoria"
         />
-        <p>{getStatusMessage()}</p>
-
-        {deleteError && <p>{deleteError}</p>}
       </div>
 
-      <div className="flex flex-col gap-4 p-4">
-        {response.status === "success" &&
-          response.data.map((product) => (
-            <div key={product.id}>
-              <h2>
-                {product.name} - {product.unit}
-              </h2>
-              <p>
-                {product.cost.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </p>
-              <button
-                className="cursor-pointer"
-                onClick={() => {
-                  setModal({ mode: "edit", product });
-                }}
-              >
-                Editar
-              </button>
-              <button
-                onClick={() => handleDelete(product.id)}
-                disabled={deletingId === product.id}
-                className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Excluir
-              </button>
-            </div>
+      {/* -------------- Status messages -------------- */}
+
+      <p role="status" className="status-text">
+        {getStatusMessage()}
+      </p>
+
+      {response.status === "error" && (
+        <p role="alert" className="alert alert--error">
+          {response.error}
+        </p>
+      )}
+
+      {deleteError && (
+        <p role="alert" className="alert alert--error">
+          {deleteError}
+        </p>
+      )}
+
+      {response.status === "success" && response.data.length === 0 && (
+        <p className="empty-state">Nenhum produto encontrado.</p>
+      )}
+      {/* -------------- Status messages -------------- */}
+
+      {response.status === "success" && response.data.length > 0 && (
+        <ul className="card-grid">
+          {response.data.map((product) => (
+            <li key={product.id} className="card">
+              <div className="card__body">
+                <div className="card__header">
+                  <div className="flex">
+                    <h2 className="card__title">{product.name}</h2>
+                    <span className="badge">{product.unit}</span>
+                  </div>
+                  <span className="badge badge--accent">
+                    {product.category}
+                  </span>
+                </div>
+                <p className="card__label">Custo</p>
+                <p className="card__price">
+                  {product.cost.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </p>
+              </div>
+
+              <div className="card__actions">
+                <button
+                  type="button"
+                  className="btn btn--secondary btn--sm"
+                  aria-label={`Editar ${product.name}`}
+                  onClick={() => {
+                    setModal({ mode: "edit", product });
+                  }}
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--danger btn--sm"
+                  aria-label={`Excluir ${product.name}`}
+                  onClick={() => handleDelete(product.id)}
+                  disabled={deletingId === product.id}
+                >
+                  {deletingId === product.id ? "Excluindo..." : "Excluir"}
+                </button>
+              </div>
+            </li>
           ))}
-      </div>
+        </ul>
+      )}
 
       {modal.mode === "create" && (
         <ProductModal
@@ -203,6 +261,6 @@ export const Products = () => {
           }}
         />
       )}
-    </>
+    </div>
   );
 };

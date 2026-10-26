@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 import { unitOptions } from "../constants/unitOptions";
 
-export const validationSchema = Yup.object().shape({
+export const validationProductSchema = Yup.object().shape({
   name: Yup.string().trim().required("Campo obrigatório"),
   unit: Yup.string()
     .oneOf(
