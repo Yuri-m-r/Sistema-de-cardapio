@@ -1,54 +1,68 @@
-import { useState } from "react";
+// ------------- Import react -------------
+import { useMemo, useState } from "react";
+// ------------- Import types -------------
 import type {
   TechDataSheetModalProps,
   TechDataSheetFormValues,
   NewTechDataSheet,
   EditedTechDataSheet,
-} from "../types/techDataSheetsType";
-
+} from "../types/techDataSheetType";
+// ------------- Import formik -------------
 import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
 import { validationDataSheetSchema } from "../validation/techDataSheetsSchema";
+// ------------- Import constants -------------
 import { unitOptions } from "../constants/unitOptions";
-import { techDataSheetcategoryOptions } from "../constants/techDataSheetcategoryOptions";
+import { techDataSheetCategoryOptions } from "../constants/techDataSheetCategoryOptions";
+// ------------- Import api -------------
 import {
   createCompleteTechDataSheet,
   updateDataSheet,
   updateDataSheetItems,
 } from "../api/techDataSheetApi";
-
-import { useTechDataSheets } from "../hooks/useTechDataSheet";
+// ------------- Import components/hooks/utils -------------
+import { useTechDataSheetItem } from "../hooks/useTechDataSheetItem";
 import { Modal } from "./Modal";
+import { Combobox } from "./Combobox";
 
-export const TechDataSheetsModal = ({
+export const TechDataSheetModal = ({
   mode,
   onClose,
   onSaved,
   dataSheet,
   allProducts,
 }: TechDataSheetModalProps) => {
+  //------------- State -------------
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isBusy, setIsBusy] = useState(false);
 
-  // ------------- Load data sheet items(custom hook) -------------
-  const response = useTechDataSheets(dataSheet?.id);
+  // ------------- Load data sheet items -------------
+  const { response } = useTechDataSheetItem(dataSheet?.id);
 
   // ------------- Initial values -------------
-  const initialValues: TechDataSheetFormValues =
-    mode === "create"
+  const initialValues = useMemo<TechDataSheetFormValues>(() => {
+    return mode === "create"
       ? {
           companyId: "1",
           name: "",
           yield: "",
-          yieldUnity: "",
+          yieldUnit: "",
           obs: "",
           prepTime: "",
           category: "",
-          products: [{ productId: "", quantity: "" }],
+          products: [
+            {
+              id: undefined,
+              productId: "",
+              quantity: "",
+              rowKey: crypto.randomUUID(),
+            },
+          ],
         }
       : {
           companyId: dataSheet.companyId,
           name: dataSheet.name,
           yield: dataSheet.yield,
-          yieldUnity: dataSheet.yieldUnity,
+          yieldUnit: dataSheet.yieldUnit,
           obs: dataSheet.obs,
           prepTime: dataSheet.prepTime,
           category: dataSheet.category,
@@ -59,13 +73,24 @@ export const TechDataSheetsModal = ({
                   id: item.id,
                   productId: item.productId,
                   quantity: item.quantity,
+                  rowKey: crypto.randomUUID(),
                 }))
               : [],
         };
+  }, [response, dataSheet, mode]);
 
   // ------------- Handle submit -------------
   const handleSubmit = async (values: TechDataSheetFormValues) => {
+    if (!values.yieldUnit) {
+      setSubmitError("Selecione uma unidade válida");
+      return;
+    } else if (!values.category) {
+      setSubmitError("Selecione uma categoria válida");
+      return;
+    }
+
     setSubmitError(null);
+    setIsBusy(true);
 
     const { products, ...fields } = values;
 
@@ -75,8 +100,10 @@ export const TechDataSheetsModal = ({
       obs: fields.obs.trim(),
       yield: Number(fields.yield),
       prepTime: Number(fields.prepTime),
+      category: values.category,
+      yieldUnit: values.yieldUnit,
     };
-
+    // ------------- Create tech data sheet -------------
     try {
       if (mode === "create") {
         const now = new Date().toISOString();
@@ -93,8 +120,14 @@ export const TechDataSheetsModal = ({
         const createdDataSheet =
           await createCompleteTechDataSheet(newDataSheet);
         onSaved(createdDataSheet);
-      } else {
-        if (response.status !== "success") return;
+      }
+      // ------------- Update tech data sheet -------------
+      else {
+        if (response.status !== "success") {
+          setSubmitError("Não foi possível salvar a ficha técnica");
+          setIsBusy(false);
+          return;
+        }
 
         const editedDataSheet: EditedTechDataSheet = {
           ...data,
@@ -123,6 +156,8 @@ export const TechDataSheetsModal = ({
           ? "Não foi possível criar a ficha técnica"
           : "Não foi possível salvar a ficha técnica",
       );
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -132,9 +167,12 @@ export const TechDataSheetsModal = ({
       title={
         mode === "create" ? "Cadastrar ficha técnica" : "Editar ficha técnica"
       }
+      isBusy={isBusy}
       onClose={onClose}
       size="lg"
     >
+      {/* ------------- Show status messages ------------- */}
+
       {mode === "edit" && response.status === "loading" ? (
         <p role="status" className="status-text">
           Carregando itens da ficha técnica...
@@ -150,14 +188,21 @@ export const TechDataSheetsModal = ({
               {submitError}
             </p>
           )}
-
           <Formik
             initialValues={initialValues}
             validationSchema={validationDataSheetSchema}
             onSubmit={handleSubmit}
           >
-            {({ values, isSubmitting, dirty, errors }) => (
+            {({
+              values,
+              isSubmitting,
+              dirty,
+              errors,
+              setFieldTouched,
+              setFieldValue,
+            }) => (
               <Form className="form">
+                {/* ------------- Fields ------------- */}
                 <div className="form-grid">
                   <div className="field form-grid__full">
                     <label htmlFor="name" className="label">
@@ -185,6 +230,7 @@ export const TechDataSheetsModal = ({
                       id="yield"
                       type="number"
                       className="input"
+                      step="0.01"
                     />
                     <ErrorMessage
                       name="yield"
@@ -194,13 +240,13 @@ export const TechDataSheetsModal = ({
                   </div>
 
                   <div className="field">
-                    <label htmlFor="yieldUnity" className="label">
+                    <label htmlFor="yieldUnit" className="label">
                       Unidade de rendimento
                     </label>
                     <Field
                       as="select"
-                      name="yieldUnity"
-                      id="yieldUnity"
+                      name="yieldUnit"
+                      id="yieldUnit"
                       className="input"
                     >
                       <option value="">Selecione uma unidade</option>
@@ -211,7 +257,7 @@ export const TechDataSheetsModal = ({
                       ))}
                     </Field>
                     <ErrorMessage
-                      name="yieldUnity"
+                      name="yieldUnit"
                       component="p"
                       className="field-error"
                     />
@@ -243,47 +289,46 @@ export const TechDataSheetsModal = ({
                       className="input"
                     >
                       <option value="">Selecione uma categoria</option>
-                      {techDataSheetcategoryOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
+                      {techDataSheetCategoryOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
                         </option>
                       ))}
                     </Field>
+
                     <ErrorMessage
-                      name="yieldUnity"
+                      name="category"
                       component="p"
                       className="field-error"
                     />
                   </div>
                 </div>
 
+                <div>
+                  <h3 className="section__title">Insumos</h3>
+                </div>
+                {/* ------------- Field array / combobox ------------- */}
                 <FieldArray name="products">
                   {({ push, remove }) => (
                     <section className="section">
-                      <div className="section__header">
-                        <h3 className="section__title">Insumos</h3>
-                        <button
-                          type="button"
-                          className="btn btn--ghost btn--sm"
-                          onClick={() =>
-                            push({
-                              productId: "",
-                              quantity: "",
-                            })
-                          }
-                        >
-                          + Adicionar insumo
-                        </button>
-                      </div>
-
                       <ul className="items-list">
                         {values.products.map((item, index) => {
                           const selectedProduct = allProducts.find(
                             (product) => product.id === item.productId,
                           );
 
+                          const usedIds = values.products.map(
+                            (row) => row.productId,
+                          );
+
+                          const availableProducts = allProducts.filter(
+                            (product) =>
+                              product.id === item.productId ||
+                              !usedIds.includes(product.id),
+                          );
+
                           return (
-                            <li key={index} className="item-row">
+                            <li key={item.rowKey} className="item-row">
                               <div className="field">
                                 <label
                                   htmlFor={`products.${index}.productId`}
@@ -291,20 +336,31 @@ export const TechDataSheetsModal = ({
                                 >
                                   Insumo
                                 </label>
-                                <Field
-                                  as="select"
-                                  name={`products.${index}.productId`}
-                                  id={`products.${index}.productId`}
-                                  className="input"
-                                >
-                                  <option value="">Selecione um insumo</option>
 
-                                  {allProducts.map((product) => (
-                                    <option key={product.id} value={product.id}>
-                                      {product.name} {product.unit}
-                                    </option>
-                                  ))}
-                                </Field>
+                                <Combobox
+                                  id={`products.${index}.productId`}
+                                  options={availableProducts}
+                                  value={item.productId}
+                                  onChange={(productId) =>
+                                    setFieldValue(
+                                      `products.${index}.productId`,
+                                      productId,
+                                    )
+                                  }
+                                  onBlur={() =>
+                                    setFieldTouched(
+                                      `products.${index}.productId`,
+                                      true,
+                                    )
+                                  }
+                                  getMeta={(p) =>
+                                    [p.category, p.unit]
+                                      .filter(Boolean)
+                                      .join(" · ")
+                                  }
+                                  placeholder="Pesquisar insumo"
+                                  emptyMessage="Nenhum insumo encontrado"
+                                />
                                 <ErrorMessage
                                   name={`products.${index}.productId`}
                                   component="p"
@@ -327,6 +383,7 @@ export const TechDataSheetsModal = ({
                                   name={`products.${index}.quantity`}
                                   id={`products.${index}.quantity`}
                                   className="input"
+                                  step="0.01"
                                 />
                                 <ErrorMessage
                                   name={`products.${index}.quantity`}
@@ -338,6 +395,7 @@ export const TechDataSheetsModal = ({
                               <button
                                 type="button"
                                 className="btn btn--danger btn--sm item-row__remove"
+                                disabled={isSubmitting}
                                 aria-label={`Remover insumo ${index + 1}`}
                                 onClick={() => remove(index)}
                               >
@@ -353,6 +411,24 @@ export const TechDataSheetsModal = ({
                           {errors.products}
                         </p>
                       )}
+
+                      <div className="section__header">
+                        <button
+                          type="button"
+                          className="btn btn--ghost btn--sm"
+                          disabled={isSubmitting}
+                          onClick={() =>
+                            push({
+                              id: undefined,
+                              productId: "",
+                              quantity: "",
+                              rowKey: crypto.randomUUID(),
+                            })
+                          }
+                        >
+                          + Adicionar insumo
+                        </button>
+                      </div>
                     </section>
                   )}
                 </FieldArray>
@@ -373,11 +449,12 @@ export const TechDataSheetsModal = ({
                     className="field-error"
                   />
                 </div>
-
+                {/* ------------- Footer buttons ------------- */}
                 <div className="modal__footer">
                   <button
                     type="button"
                     className="btn btn--secondary"
+                    disabled={isBusy}
                     onClick={() => onClose()}
                   >
                     Cancelar
@@ -385,9 +462,7 @@ export const TechDataSheetsModal = ({
                   <button
                     type="submit"
                     className="btn btn--primary"
-                    disabled={
-                      isSubmitting || !dirty || response.status === "error"
-                    }
+                    disabled={isSubmitting || !dirty}
                   >
                     {isSubmitting
                       ? "Salvando..."

@@ -1,23 +1,18 @@
 import { useEffect, useId, useRef } from "react";
-import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
+import type { ModalProps } from "../types/sharedType";
 
-type ModalProps = {
-  title: string;
-  onClose: () => void;
-  size?: "md" | "lg";
-  children: ReactNode;
-};
-
-// ------------- Change focus -------------
 export const Modal = ({
   title,
   onClose,
   size = "md",
   children,
+  isBusy = false,
 }: ModalProps) => {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
 
+  // ------------- Change focus -------------
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
@@ -34,15 +29,15 @@ export const Modal = ({
   // ------------- Esc close -------------
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape" && !isBusy) onClose();
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [onClose, isBusy]);
 
   // ------------- Render -------------
-  return (
+  return createPortal(
     <div className="modal-overlay">
       <div
         ref={dialogRef}
@@ -60,6 +55,7 @@ export const Modal = ({
             type="button"
             className="modal__close"
             aria-label="Fechar"
+            disabled={isBusy}
             onClick={() => onClose()}
           >
             ×
@@ -67,6 +63,7 @@ export const Modal = ({
         </header>
         <div className="modal__body">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };

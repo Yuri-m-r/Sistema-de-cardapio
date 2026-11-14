@@ -5,20 +5,19 @@ import { Menus } from "./pages/Menus";
 import { Products } from "./pages/Products";
 import { TechDataSheets } from "./pages/TechDataSheets";
 import { MainLayout } from "./layouts/MainLayout";
+import { NotFound } from "./pages/NotFound";
 
 function App() {
   return (
     <>
       <Routes>
+        <Route path="*" element={<NotFound />} />
         <Route path="/" element={<Home />} />
 
         <Route element={<MainLayout />}>
           <Route path="/menus" element={<Menus />} />
           <Route path="/products" element={<Products />} />
-          <Route
-            path="/technical-data-sheets"
-            element={<TechDataSheets />}
-          />
+          <Route path="/technical-data-sheets" element={<TechDataSheets />} />
         </Route>
       </Routes>
     </>

@@ -11,154 +11,183 @@
   "products": [
     {
       "companyId": "1",
-      "name": "Cebola",
+      "name": "Arroz",
       "unit": "KG",
-      "cost": 5.5,
-      "id": "WEzEPacSFXc",
-      "category": "Hortifruti"
+      "cost": 5,
+      "category": "CARBODRATOS",
+      "id": "FEdyNbVhNf4"
     },
     {
       "companyId": "1",
-      "name": "Arroz branco",
+      "name": "Cebola",
       "unit": "KG",
-      "cost": 5,
-      "id": "GtHK8fOQYgA",
-      "category": "Grãos e Cereais"
+      "cost": 4,
+      "category": "HORTIFRUTI",
+      "id": "Nxusz4v19E0"
+    },
+    {
+      "companyId": "1",
+      "name": "Feijao",
+      "unit": "PCT",
+      "cost": 7,
+      "category": "CARBOIDRATOS",
+      "id": "sCPoByCnb8M"
     },
     {
       "companyId": "1",
       "name": "Alho",
       "unit": "KG",
       "cost": 11,
-      "id": "9beEqS6fJ4s",
-      "category": "Hortifruti"
-    },
-    {
-      "companyId": "1",
-      "name": "Feijao",
-      "unit": "KG",
-      "cost": 8,
-      "id": "_P2MqZCMo7Q",
-      "category": "Grãos e Cereais"
-    },
-    {
-      "companyId": "1",
-      "name": "Calabresa",
-      "unit": "KG",
-      "cost": 7,
-      "id": "Jv1lBJYkMlk",
-      "category": "Proteínas"
+      "category": "HORTIFRUTI",
+      "id": "0iP9Thrme7s"
     },
     {
       "companyId": "1",
       "name": "Agua",
       "unit": "L",
-      "cost": 2.5,
-      "id": "nEAP3Bvpt68",
-      "category": "Bebidas"
-    },
-    {
-      "companyId": "1",
-      "name": "Polpa de manga",
-      "unit": "KG",
-      "cost": 7,
-      "id": "_Ze4ikbG59U",
-      "category": "Polpas de Frutas"
+      "cost": 2,
+      "category": "BEBIDAS",
+      "id": "-cp-mMaMWI4"
     },
     {
       "companyId": "1",
       "name": "Açucar",
       "unit": "KG",
       "cost": 3,
-      "id": "T59b7NY7oh0",
-      "category": "Açúcares e Adoçantes"
+      "category": "AÇUCARES ADOÇANTES",
+      "id": "UBnmszuJyZg"
     },
     {
       "companyId": "1",
-      "name": "Alface",
-      "unit": "UN",
-      "cost": 5,
-      "category": "Açúcares e Adoçantes",
-      "id": "mKjnTL4mYGk"
+      "name": "Polpa de manga",
+      "unit": "KG",
+      "cost": 7,
+      "category": "POLPAS DE FRUTAS",
+      "id": "1EszMmlLGdw"
+    },
+    {
+      "companyId": "1",
+      "name": "Calabresa",
+      "unit": "KG",
+      "cost": 15,
+      "category": "PROTEINAS",
+      "id": "64tL2uQnblg"
     }
   ],
   "techDataSheets": [
     {
       "companyId": "1",
-      "name": "Arroz",
-      "yield": 2.5,
-      "yieldUnity": "KG",
-      "obs": "1. Separe e meça os ingredientes conforme a quantidade desejada.\n2. Em uma panela, aqueça o óleo e refogue o alho picado até dourar levemente.\n3. Adicione o arroz e refogue por aproximadamente 2 minutos, mexendo para envolver os grãos no tempero.\n4. Acrescente a água quente e o sal, misturando para distribuir os ingredientes.\n5. Cozinhe em fogo médio até a água começar a baixar. Em seguida, reduza o fogo e tampe parcialmente a panela.\n6. Deixe cozinhar até que a água seja completamente absorvida e os grãos estejam macios.\n7. Desligue o fogo, tampe a panela e deixe o arroz descansar por cerca de 5 minutos.\n8. Solte os grãos delicadamente com um garfo e sirva.",
-      "prepTime": 20,
-      "category": "Acompanhamento",
-      "creationDate": "2026-10-26T18:32:26.962Z",
-      "lastRevision": "2026-10-26T18:32:26.962Z",
-      "id": "UhA5n3tKCHs"
+      "name": "Feijoada",
+      "yield": 3,
+      "yieldUnit": "KG",
+      "obs": "Modo de preparo — Feijoada\n\n1. Escolha o feijão-preto, retirando impurezas, e lave bem em água corrente. Deixe de molho por aproximadamente 8 a 12 horas e descarte a água antes do preparo.\n2. Dessalgue as carnes salgadas, deixando-as de molho em água fria e trocando a água periodicamente, conforme a necessidade de cada corte.\n3. Em uma panela de pressão, coloque o feijão, as carnes preparadas e água suficiente para cobrir os ingredientes, respeitando o limite de segurança da panela.\n4. Cozinhe sob pressão até que o feijão e as carnes estejam macios, seguindo o tempo recomendado para os cortes utilizados. Desligue o fogo e aguarde a pressão sair completamente antes de abrir.\n5. Em uma panela separada, aqueça um pouco de óleo e refogue alho e cebola picados até dourarem levemente.\n6. Acrescente uma porção do feijão cozido ao refogado e misture bem. Se desejar um caldo mais encorpado, amasse alguns grãos e devolva-os à panela.\n7. Transfira o refogado para a panela da feijoada, misture delicadamente e deixe ferver em fogo baixo para incorporar os sabores e ajustar a consistência do caldo.\n8. Prove e ajuste o sal somente se necessário. Finalize com cheiro-verde, se desejar.\n9. Sirva quente, acompanhada de arroz branco, couve refogada, farofa, laranja e outros acompanhamentos de sua preferência.",
+      "prepTime": 120,
+      "category": "PRATO PRINCIPAL",
+      "creationDate": "2026-11-05T22:54:10.206Z",
+      "lastRevision": "2026-11-06T00:13:36.703Z",
+      "id": "N2EmWVfIzBg"
     },
     {
       "companyId": "1",
       "name": "Suco de manga",
       "yield": 3,
-      "yieldUnity": "L",
+      "yieldUnit": "L",
       "obs": "Modo de preparo — Suco de manga com polpa\n\n1. Separe a polpa de manga congelada, a água filtrada e o açúcar, caso necessário.\n2. Coloque a polpa e a água no liquidificador, respeitando a proporção indicada para a quantidade desejada.\n3. Bata por aproximadamente 1 a 2 minutos, até obter uma mistura homogênea.\n4. Prove e, se necessário, adicione açúcar e bata novamente até dissolver.\n5. Sirva imediatamente, preferencialmente gelado.\n\nObservação: ajuste a quantidade de água conforme a concentração desejada para o suco.",
-      "prepTime": 5,
-      "category": "Suco",
-      "creationDate": "2026-10-26T18:37:22.574Z",
-      "lastRevision": "2026-10-26T18:39:48.336Z",
-      "id": "1S1YZJxhEJ4"
+      "prepTime": 10,
+      "category": "SUCO",
+      "creationDate": "2026-11-05T22:57:17.847Z",
+      "lastRevision": "2026-11-05T22:57:17.847Z",
+      "id": "RLXeG-B3wxM"
+    },
+    {
+      "companyId": "1",
+      "name": "dwa",
+      "yield": 2,
+      "yieldUnit": "G",
+      "obs": "e",
+      "prepTime": 2,
+      "category": "ENTRADA",
+      "creationDate": "2026-11-13T17:10:10.430Z",
+      "lastRevision": "2026-11-14T14:03:58.440Z",
+      "id": "bvM5SvoWLN4"
     }
   ],
   "itemDetails": [
     {
-      "techDataSheetsId": "UhA5n3tKCHs",
-      "productId": "GtHK8fOQYgA",
+      "techDataSheetsId": "RLXeG-B3wxM",
+      "productId": "-cp-mMaMWI4",
       "quantity": 1,
-      "id": "cVuFeandRHE"
+      "id": "zwP0jfTpc_k"
     },
     {
-      "techDataSheetsId": "UhA5n3tKCHs",
-      "productId": "WEzEPacSFXc",
+      "techDataSheetsId": "RLXeG-B3wxM",
+      "productId": "1EszMmlLGdw",
+      "quantity": 1,
+      "id": "rd4Gt-1xcTc"
+    },
+    {
+      "techDataSheetsId": "RLXeG-B3wxM",
+      "productId": "UBnmszuJyZg",
       "quantity": 0.5,
-      "id": "fy4BuyNaFgY"
+      "id": "BRfznABB-z0"
     },
     {
-      "techDataSheetsId": "UhA5n3tKCHs",
-      "productId": "9beEqS6fJ4s",
+      "techDataSheetsId": "N2EmWVfIzBg",
+      "productId": "sCPoByCnb8M",
+      "quantity": 1,
+      "id": "WLQzh1meRT4"
+    },
+    {
+      "techDataSheetsId": "N2EmWVfIzBg",
+      "productId": "-cp-mMaMWI4",
+      "quantity": 1,
+      "id": "zIS2i604Evg"
+    },
+    {
+      "techDataSheetsId": "N2EmWVfIzBg",
+      "productId": "0iP9Thrme7s",
       "quantity": 0.05,
-      "id": "JeHa0AJgKqU"
+      "id": "HoEJwXvTo5c"
     },
     {
-      "techDataSheetsId": "1S1YZJxhEJ4",
-      "productId": "nEAP3Bvpt68",
-      "quantity": 1,
-      "id": "dO-C7070p4A"
+      "techDataSheetsId": "N2EmWVfIzBg",
+      "productId": "64tL2uQnblg",
+      "quantity": 0.2,
+      "id": "X3M8emR9A1U"
     },
     {
-      "techDataSheetsId": "1S1YZJxhEJ4",
-      "productId": "_Ze4ikbG59U",
-      "quantity": 1,
-      "id": "_JOnGR95Knc"
-    },
-    {
-      "techDataSheetsId": "1S1YZJxhEJ4",
-      "productId": "T59b7NY7oh0",
+      "techDataSheetsId": "N2EmWVfIzBg",
+      "productId": "Nxusz4v19E0",
       "quantity": 0.5,
-      "id": "wGO9821HtgA"
+      "id": "tU48Hg7xfSk"
+    },
+    {
+      "techDataSheetsId": "bvM5SvoWLN4",
+      "productId": "Nxusz4v19E0",
+      "quantity": 1.55,
+      "id": "8rLnioWtZRQ"
     }
   ],
   "menus": [
     {
-      "id": "1",
       "companyId": "1",
-      "name": "Cardápio da semana"
+      "name": "Segundinha abençoada",
+      "weekDay": "SEGUNDA",
+      "id": "RJIsMa9v_wc"
     }
   ],
   "menuItems": [
     {
-      "id": "1",
-      "menuId": "1",
-      "techDataSheetsId": "1",
-      "portionsPredicted": 50
+      "menuId": "RJIsMa9v_wc",
+      "techDataSheetsId": "N2EmWVfIzBg",
+      "portionsPredicted": 3,
+      "id": "gK-LtZ44FlM"
+    },
+    {
+      "menuId": "RJIsMa9v_wc",
+      "techDataSheetsId": "RLXeG-B3wxM",
+      "portionsPredicted": 4,
+      "id": "xh-rGWNqEko"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

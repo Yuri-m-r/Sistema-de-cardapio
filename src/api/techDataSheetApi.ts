@@ -1,10 +1,13 @@
+// ------------- Import api -------------
 import { api } from "./api";
+// ------------- Import types -------------
 import type {
   TechDataSheet,
   TechDataSheetItem,
   NewTechDataSheet,
   EditedTechDataSheet,
-} from "../types/techDataSheetsType";
+} from "../types/techDataSheetType";
+import type { MenuItems } from "../types/menuType";
 
 // ------------- Get tech data sheet -------------
 export const searchDataSheets = async (search: string = "") => {
@@ -19,29 +22,21 @@ export const searchDataSheets = async (search: string = "") => {
       }),
     },
   });
+
   return response.data;
 };
-
-export const getDataSheetItems = async (id?: string) => {
-  if (!id) {
-    const response = await api.get<TechDataSheetItem[]>("/itemDetails");
-    return response.data;
-  }
+export const getDataSheetItems = async (id: string) => {
   const response = await api.get<TechDataSheetItem[]>("/itemDetails", {
-    params: {
-      _where: JSON.stringify({
-        techDataSheetsId: {
-          eq: id,
-        },
-      }),
-    },
+    params: { techDataSheetsId: id },
   });
+
   return response.data;
 };
 
 // ------------- Delete tech data sheet -------------
 export const deleteTechDataSheet = async (id: string) => {
   const response = await api.delete<TechDataSheet>(`/techDataSheets/${id}`);
+
   return response.data;
 };
 
@@ -50,13 +45,14 @@ export const deleteDataSheetItems = async (id: string) => {
 
   await Promise.all(data.map((item) => api.delete(`/itemDetails/${item.id}`)));
 };
+
 // ------------- Create tech data sheet -------------
 const createDataSheet = async (dataSheet: NewTechDataSheet) => {
   const response = await api.post<TechDataSheet>("/techDataSheets", {
     companyId: dataSheet.companyId,
     name: dataSheet.name,
     yield: dataSheet.yield,
-    yieldUnity: dataSheet.yieldUnity,
+    yieldUnit: dataSheet.yieldUnit,
     obs: dataSheet.obs,
     prepTime: dataSheet.prepTime,
     category: dataSheet.category,
@@ -127,7 +123,7 @@ export const updateDataSheet = async (dataSheet: EditedTechDataSheet) => {
       companyId: dataSheet.companyId,
       name: dataSheet.name,
       yield: dataSheet.yield,
-      yieldUnity: dataSheet.yieldUnity,
+      yieldUnit: dataSheet.yieldUnit,
       obs: dataSheet.obs,
       prepTime: dataSheet.prepTime,
       category: dataSheet.category,
@@ -148,30 +144,34 @@ export const updateDataSheetItems = async (
       !editedDataSheet.products.some((item) => item.id === current.id),
   );
 
-  try {
-    await Promise.all(
-      removedItems.map((item) => api.delete(`/itemDetails/${item.id}`)),
-    );
+  const responses = await Promise.all(
+    editedDataSheet.products.map((item) => {
+      const body = {
+        techDataSheetsId: editedDataSheet.id,
+        productId: item.productId,
+        quantity: item.quantity,
+      };
 
-    const responses = await Promise.all(
-      editedDataSheet.products.map((item) => {
-        const body = {
-          techDataSheetsId: editedDataSheet.id,
-          productId: item.productId,
-          quantity: item.quantity,
-        };
+      return item.id
+        ? api.put<TechDataSheetItem>(`/itemDetails/${item.id}`, {
+            ...body,
+            id: item.id,
+          })
+        : api.post<TechDataSheetItem>("/itemDetails", body);
+    }),
+  );
+  await Promise.all(
+    removedItems.map((item) => api.delete(`/itemDetails/${item.id}`)),
+  );
 
-        return item.id
-          ? api.put<TechDataSheetItem>(`/itemDetails/${item.id}`, {
-              ...body,
-              id: item.id,
-            })
-          : api.post<TechDataSheetItem>("/itemDetails", body);
-      }),
-    );
+  return responses.map((res) => res.data);
+};
 
-    return responses.map((res) => res.data);
-  } catch (error) {
-    throw error;
-  }
+// ------------- Is tech data sheet in use -------------
+
+export const isTechDataSheetInUse = async (techDataSheetsId: string) => {
+  const response = await api.get<MenuItems[]>("/menuItems", {
+    params: { techDataSheetsId },
+  });
+  return response.data.length > 0;
 };

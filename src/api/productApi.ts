@@ -1,5 +1,8 @@
-import type { Product, NewProduct } from "../types/productType";
+// ------------- Import api -------------
 import { api } from "./api";
+// ------------- Import types -------------
+import type { Product, NewProduct } from "../types/productType";
+import type { TechDataSheetItem } from "../types/techDataSheetType";
 
 // ------------- Get products -------------
 export const searchProducts = async (search: string = "") => {
@@ -9,14 +12,12 @@ export const searchProducts = async (search: string = "") => {
     params: {
       ...(term && {
         _where: JSON.stringify({
-          or: [
-            { name: { contains: term } },
-            { category: { contains: term } },
-          ],
+          or: [{ name: { contains: term } }, { category: { contains: term } }],
         }),
       }),
     },
   });
+
   return response.data;
 };
 
@@ -36,4 +37,13 @@ export const createProduct = async (product: NewProduct) => {
 export const updateProduct = async (product: Product) => {
   const response = await api.put<Product>(`/products/${product.id}`, product);
   return response.data;
+};
+
+// ------------- Is product in use -------------
+
+export const isProductInUse = async (productId: string) => {
+  const response = await api.get<TechDataSheetItem[]>("/itemDetails", {
+    params: { productId },
+  });
+  return response.data.length > 0;
 };

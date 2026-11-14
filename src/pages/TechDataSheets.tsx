@@ -1,105 +1,59 @@
-import type { RequestState } from "../types/sharedTypes";
-import { useState, useEffect } from "react";
+// ------------- Import react -------------
+import { useState, useCallback } from "react";
+//------------- Import api -------------
 import {
   searchDataSheets,
   deleteTechDataSheet,
   deleteDataSheetItems,
+  isTechDataSheetInUse,
 } from "../api/techDataSheetApi";
-import { searchProducts } from "../api/productsApi";
-
+// ------------- Import types -------------
 import type {
   TechDataSheet,
   TechDataSheetModalState,
-} from "../types/techDataSheetsType";
-import type { Product } from "../types/productType";
-
-import { TechDataSheetsViewModal } from "../components/TechDataSheetViewModal";
-import { TechDataSheetsModal } from "../components/TechDataSheetModal";
+} from "../types/techDataSheetType";
+// ------------- Import components -------------
+import { TechDataSheetViewModal } from "../components/TechDataSheetViewModal";
+import { TechDataSheetModal } from "../components/TechDataSheetModal";
+//------------- Import hooks -------------
+import { useProduct } from "../hooks/useProduct";
+import { useDebounce } from "../hooks/useDebounce";
+import { useFetch } from "../hooks/useFetch";
+import { useSearchQuery } from "../hooks/useSearchQuery";
+//------------- Import errors/utils -------------
+import { InUseError } from "../errors/InUseError";
+import { formatNumber } from "../utils/formatNumber";
 
 export const TechDataSheets = () => {
-  const [response, setResponse] = useState<RequestState<TechDataSheet[]>>({
-    status: "loading",
-  });
-  const [search, setSearch] = useState("");
+  // ------------- State -------------
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [modal, setModal] = useState<TechDataSheetModalState>({
     mode: "closed",
   });
-  const [productsResponse, setProductsResponse] = useState<
-    RequestState<Product[]>
-  >({
-    status: "loading",
-  });
+  const { search, handleSearchChange, clearSearch } = useSearchQuery();
+  const debouncedSearch = useDebounce(search, 300);
+
   // ------------- Show tech data sheets -------------
-  useEffect(() => {
-    setResponse({ status: "loading" });
-    let ignore = false;
-    const timer = setTimeout(() => {
-      const fetchTechnicalDataSheets = async () => {
-        try {
-          const data = await searchDataSheets(search);
-          if (ignore) return;
-          setResponse({ status: "success", data });
-        } catch (error) {
-          if (ignore) return;
-          setResponse({
-            status: "error",
-            error: "Erro ao buscar fichas técnicas",
-          });
-          console.error(error);
-        }
-      };
-      fetchTechnicalDataSheets();
-    }, 300);
+  const { response: productsResponse } = useProduct();
+  const fetchTechDataSheets = useCallback(() => {
+    return searchDataSheets(debouncedSearch);
+  }, [debouncedSearch]);
 
-    return () => {
-      ignore = true;
-      clearTimeout(timer);
-    };
-  }, [search]);
-
-  useEffect(() => {
-    let ignore = false;
-
-    const loadProducts = async () => {
-      try {
-        const data = await searchProducts();
-
-        if (ignore) return;
-
-        setProductsResponse({
-          status: "success",
-          data,
-        });
-      } catch (error) {
-        if (ignore) return;
-
-        console.error(error);
-
-        setProductsResponse({
-          status: "error",
-          error: "Erro ao carregar produtos.",
-        });
-      }
-    };
-
-    loadProducts();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  // ------------- Delete tech data sheets -------------
-  const handleDelete = async (id: string) => {
+  const { response, setResponse, isFetching } = useFetch({
+    fetcher: fetchTechDataSheets,
+    errorMessage: "Erro ao buscar fichas técnicas",
+    keepPreviousData: true,
+  });
+  // ------------- Handle deleted tech data sheets -------------
+  const handleDeleted = async (id: string) => {
     if (response.status !== "success") return;
     const item = response.data.find((dataSheet) => dataSheet.id === id);
 
     if (!item) return;
 
     const confirmed = window.confirm(
-      `Tem certeza que deseja excluir o item ${item.name}?`,
+      `Tem certeza que deseja excluir a ficha técnica ${item.name}?`,
     );
 
     if (!confirmed) return;
@@ -107,6 +61,14 @@ export const TechDataSheets = () => {
     setDeletingId(id);
 
     try {
+      const usedDataSheets = await isTechDataSheetInUse(id);
+
+      if (usedDataSheets) {
+        throw new InUseError(
+          "A ficha técnica está sendo usada em um cardápio e não pode ser excluída.",
+        );
+      }
+
       await deleteDataSheetItems(id);
       await deleteTechDataSheet(id);
 
@@ -120,15 +82,19 @@ export const TechDataSheets = () => {
         return prev;
       });
     } catch (error) {
-      setDeleteError("Erro ao excluir a ficha técnica");
       console.error(error);
+      if (error instanceof InUseError) {
+        setDeleteError(error.message);
+      } else {
+        setDeleteError("Erro ao excluir a ficha técnica. Tente novamente.");
+      }
     } finally {
       setDeletingId(null);
     }
   };
 
-  // ------------- Create tech data sheets -------------
-  const handleDataSheetCreate = (newDataSheet: TechDataSheet) => {
+  // ------------- Handle created tech data sheets -------------
+  const handleDataSheetCreated = (newDataSheet: TechDataSheet) => {
     setResponse((prev) => {
       if (prev.status === "success") {
         return {
@@ -138,10 +104,10 @@ export const TechDataSheets = () => {
       }
       return prev;
     });
-    setSearch("");
+    clearSearch();
   };
 
-  // ------------- Update tech data sheets -------------
+  // ------------- Handle updated tech data sheets -------------
   const handleDataSheetUpdated = (savedDataSheet: TechDataSheet) => {
     setResponse((prev) => {
       if (prev.status === "success") {
@@ -158,7 +124,7 @@ export const TechDataSheets = () => {
 
   // ------------- Show status messages -------------
   const getStatusMessage = () => {
-    if (response.status === "loading") return "Buscando...";
+    if (response.status === "loading" || isFetching) return "Buscando...";
     if (response.status === "success" && response.data.length > 0)
       return `Total de fichas técnicas encontradas: ${response.data.length}`;
     return null;
@@ -197,7 +163,7 @@ export const TechDataSheets = () => {
           id="search"
           className="input"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="Digite o nome da ficha técnica ou categoria"
         />
       </div>
@@ -246,7 +212,7 @@ export const TechDataSheets = () => {
                 </div>
                 <p className="card__label">Rendimento</p>
                 <p className="card__value">
-                  {techDataSheet.yield.toFixed(2)} {techDataSheet.yieldUnity}
+                  {formatNumber(techDataSheet.yield)} {techDataSheet.yieldUnit}
                 </p>
                 <p className="card__label">Tempo de preparo</p>
                 <p className="card__value">{techDataSheet.prepTime} minutos</p>
@@ -257,10 +223,7 @@ export const TechDataSheets = () => {
                   type="button"
                   className="btn btn--secondary btn--sm"
                   aria-label={`Visualizar ${techDataSheet.name}`}
-                  disabled={
-                    deletingId === techDataSheet.id ||
-                    productsResponse.status !== "success"
-                  }
+                  disabled={deletingId === techDataSheet.id}
                   onClick={() =>
                     setModal({
                       mode: "view",
@@ -274,10 +237,7 @@ export const TechDataSheets = () => {
                   type="button"
                   className="btn btn--secondary btn--sm"
                   aria-label={`Editar ${techDataSheet.name}`}
-                  disabled={
-                    deletingId === techDataSheet.id ||
-                    productsResponse.status !== "success"
-                  }
+                  disabled={deletingId === techDataSheet.id}
                   onClick={() =>
                     setModal({
                       mode: "edit",
@@ -291,9 +251,9 @@ export const TechDataSheets = () => {
                   type="button"
                   className="btn btn--danger btn--sm"
                   aria-label={`Excluir ${techDataSheet.name}`}
-                  disabled={deletingId === techDataSheet.id}
+                  disabled={deletingId !== null}
                   onClick={() => {
-                    handleDelete(techDataSheet.id);
+                    handleDeleted(techDataSheet.id);
                   }}
                 >
                   {deletingId === techDataSheet.id ? "Excluindo..." : "Excluir"}
@@ -304,26 +264,27 @@ export const TechDataSheets = () => {
         </ul>
       )}
 
+      {/* -------------- View tech data sheets -------------- */}
       {modal.mode === "view" && productsResponse.status === "success" && (
-        <TechDataSheetsViewModal
+        <TechDataSheetViewModal
           key={modal.dataSheet.id}
           onClose={() => setModal({ mode: "closed" })}
           dataSheet={modal.dataSheet}
           products={productsResponse.data}
         />
       )}
-
+      {/* -------------- Create tech data sheets -------------- */}
       {modal.mode === "create" && productsResponse.status === "success" && (
-        <TechDataSheetsModal
+        <TechDataSheetModal
           mode={modal.mode}
           onClose={() => setModal({ mode: "closed" })}
-          onSaved={handleDataSheetCreate}
+          onSaved={handleDataSheetCreated}
           allProducts={productsResponse.data}
         />
       )}
-
+      {/* -------------- Update tech data sheets -------------- */}
       {modal.mode === "edit" && productsResponse.status === "success" && (
-        <TechDataSheetsModal
+        <TechDataSheetModal
           key={modal.dataSheet.id}
           mode={modal.mode}
           onClose={() => setModal({ mode: "closed" })}

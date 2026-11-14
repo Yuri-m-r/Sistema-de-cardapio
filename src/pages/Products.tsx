@@ -1,58 +1,43 @@
-import { useState, useEffect } from "react";
-import { deleteProduct, searchProducts } from "../api/productsApi";
-
-import { getDataSheetItems } from "../api/techDataSheetApi";
-import { ProductModal } from "../components/ProductModal";
+// ------------- Import react -------------
+import { useState, useCallback } from "react";
+// ------------- Import api -------------
+import {
+  deleteProduct,
+  isProductInUse,
+  searchProducts,
+} from "../api/productApi";
+// ------------- Import types -------------
 import type { Product, ProductModalState } from "../types/productType";
-
-import type { RequestState } from "../types/sharedTypes";
+// ------------- Import components -------------
+import { ProductModal } from "../components/ProductModal";
+// ------------- Import hooks -------------
+import { useDebounce } from "../hooks/useDebounce";
+import { useFetch } from "../hooks/useFetch";
+import { useSearchQuery } from "../hooks/useSearchQuery";
+//------------- Import errors / utils -------------
+import { InUseError } from "../errors/InUseError";
+import { formatCurrency } from "../utils/formatCurrency";
 
 export const Products = () => {
-  const [search, setSearch] = useState("");
-  const [response, setResponse] = useState<RequestState<Product[]>>({
-    status: "loading",
-  });
+  // ------------- State -------------
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modal, setModal] = useState<ProductModalState>({ mode: "closed" });
+  const { search, handleSearchChange, clearSearch } = useSearchQuery();
+  const debouncedSearch = useDebounce(search, 300);
 
   // ------------- Show products -------------
-  useEffect(() => {
-    setResponse({ status: "loading" });
-    setDeleteError(null);
+  const fetchProducts = useCallback(() => {
+    return searchProducts(debouncedSearch);
+  }, [debouncedSearch]);
 
-    let ignore = false;
-
-    const timer = setTimeout(() => {
-      const fetchProducts = async () => {
-        try {
-          const products = await searchProducts(search);
-
-          if (ignore) return;
-
-          setResponse({ status: "success", data: products });
-        } catch (error) {
-          if (ignore) return;
-
-          console.error(error);
-          setResponse({
-            status: "error",
-            error: "Erro ao buscar produtos",
-          });
-        }
-      };
-
-      fetchProducts();
-    }, 300);
-
-    return () => {
-      ignore = true;
-      clearTimeout(timer);
-    };
-  }, [search]);
-
-  // ------------- Delete products -------------
-  const handleDelete = async (id: string) => {
+  const { response, setResponse, isFetching } = useFetch({
+    fetcher: fetchProducts,
+    errorMessage: "Erro ao buscar produtos",
+    keepPreviousData: true,
+  });
+  // ------------- Handle deleted products -------------
+  const handleDeleted = async (id: string) => {
     if (response.status !== "success") return;
 
     const item = response.data.find((product) => product.id === id);
@@ -60,7 +45,7 @@ export const Products = () => {
     if (!item) return;
 
     const confirmed = window.confirm(
-      `Tem certeza que deseja excluir o item ${item.name}?`,
+      `Tem certeza que deseja excluir o produto ${item.name}?`,
     );
 
     if (!confirmed) return;
@@ -69,11 +54,12 @@ export const Products = () => {
     setDeletingId(id);
 
     try {
-      const itemsDetails = await getDataSheetItems();
-      const usedProduct = itemsDetails.find((item) => item.productId === id);
+      const usedProduct = await isProductInUse(id);
 
       if (usedProduct) {
-        throw new Error("O produto esta sendo usado por uma ficha tecnica");
+        throw new InUseError(
+          "O produto está sendo usado por uma ficha técnica e não pode ser excluído",
+        );
       }
 
       await deleteProduct(id);
@@ -88,7 +74,7 @@ export const Products = () => {
       });
     } catch (error) {
       console.error(error);
-      if (error instanceof Error) {
+      if (error instanceof InUseError) {
         setDeleteError(error.message);
       } else {
         setDeleteError("Erro ao excluir produto");
@@ -100,13 +86,13 @@ export const Products = () => {
 
   // ------------- Show status messages -------------
   const getStatusMessage = () => {
-    if (response.status === "loading") return "Buscando...";
+    if (isFetching) return "Buscando...";
     if (response.status === "success" && response.data.length > 0)
       return `Total de produtos encontrados: ${response.data.length}`;
     return null;
   };
 
-  // ------------- Handle new product -------------
+  // ------------- Handle created product -------------
   const handleProductCreated = (newProduct: Product) => {
     setResponse((prev) => {
       if (prev.status === "success") {
@@ -117,10 +103,10 @@ export const Products = () => {
       }
       return prev;
     });
-    setSearch("");
+    clearSearch();
   };
 
-  // ------------- Handle edit products -------------
+  // ------------- Handle updated products -------------
   const handleProductUpdated = (updatedProduct: Product) => {
     setResponse((prev) => {
       if (prev.status === "success") {
@@ -163,7 +149,10 @@ export const Products = () => {
           id="search"
           className="input"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            handleSearchChange(e.target.value);
+            setDeleteError(null);
+          }}
           placeholder="Digite o nome do produto ou categoria"
         />
       </div>
@@ -197,7 +186,7 @@ export const Products = () => {
             <li key={product.id} className="card">
               <div className="card__body">
                 <div className="card__header">
-                  <div className="flex">
+                  <div className="card__title-group">
                     <h2 className="card__title">{product.name}</h2>
                     <span className="badge">{product.unit}</span>
                   </div>
@@ -206,18 +195,14 @@ export const Products = () => {
                   </span>
                 </div>
                 <p className="card__label">Custo</p>
-                <p className="card__price">
-                  {product.cost.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </p>
+                <p className="card__price">{formatCurrency(product.cost)}</p>
               </div>
 
               <div className="card__actions">
                 <button
                   type="button"
                   className="btn btn--secondary btn--sm"
+                  disabled={deletingId === product.id}
                   aria-label={`Editar ${product.name}`}
                   onClick={() => {
                     setModal({ mode: "edit", product });
@@ -229,8 +214,8 @@ export const Products = () => {
                   type="button"
                   className="btn btn--danger btn--sm"
                   aria-label={`Excluir ${product.name}`}
-                  onClick={() => handleDelete(product.id)}
-                  disabled={deletingId === product.id}
+                  onClick={() => handleDeleted(product.id)}
+                  disabled={deletingId !== null}
                 >
                   {deletingId === product.id ? "Excluindo..." : "Excluir"}
                 </button>
@@ -239,6 +224,7 @@ export const Products = () => {
           ))}
         </ul>
       )}
+      {/* -------------- Create product -------------- */}
 
       {modal.mode === "create" && (
         <ProductModal
@@ -249,6 +235,7 @@ export const Products = () => {
           }}
         />
       )}
+      {/* -------------- Update product -------------- */}
 
       {modal.mode === "edit" && (
         <ProductModal

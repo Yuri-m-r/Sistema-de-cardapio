@@ -26,8 +26,7 @@
 }
 
 @layer components {
-  /* ---------- General layout
- ---------- */
+  /* ---------- Layout geral ---------- */
   .app-shell {
     @apply flex min-h-screen flex-col;
   }
@@ -36,13 +35,13 @@
     @apply mx-auto w-full max-w-6xl flex-1 px-4 py-8;
   }
 
-  /* ---------- Internal page navigation ---------- */
+  /* ---------- Navegação interna (NavPages) ---------- */
   .app-header {
     @apply sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-sm;
   }
 
   .app-header__inner {
-    @apply mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3;
+    @apply mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3;
   }
 
   .brand {
@@ -61,7 +60,7 @@
     @apply bg-orange-50 text-orange-700 hover:bg-orange-50 hover:text-orange-700;
   }
 
-  /* ---------- Home ---------- */
+  /* ---------- Home (NavHome) ---------- */
   .home {
     @apply flex min-h-screen items-center justify-center px-4 py-12;
   }
@@ -90,7 +89,7 @@
     @apply text-orange-600;
   }
 
-  /* ---------- Pages (header, search, status) ---------- */
+  /* ---------- Páginas (cabeçalho, status, alertas) ---------- */
   .page {
     @apply flex flex-col gap-6;
   }
@@ -105,10 +104,6 @@
 
   .page__subtitle {
     @apply mt-1 text-sm text-slate-500;
-  }
-
-  .search {
-    @apply w-full sm:max-w-sm flex flex-row;
   }
 
   .status-text {
@@ -141,11 +136,16 @@
   }
 
   .card__header {
-    @apply mb-2 flex items-start justify-between gap-3;
+    @apply mb-2 flex flex-wrap items-start justify-between gap-3;
+  }
+
+  /* Agrupa título + badge de unidade (usado em Products) */
+  .card__title-group {
+    @apply flex min-w-0 items-center gap-2;
   }
 
   .card__title {
-    @apply text-base font-semibold text-slate-900;
+    @apply break-words text-base font-semibold text-slate-900;
   }
 
   .card__label {
@@ -168,7 +168,11 @@
     @apply inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600;
   }
 
-  /* ---------- Buttons ---------- */
+  .badge--accent {
+    @apply bg-orange-50 text-orange-700;
+  }
+
+  /* ---------- Botões ---------- */
   .btn {
     @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
   }
@@ -193,7 +197,7 @@
     @apply text-orange-700 enabled:hover:bg-orange-50;
   }
 
-  /* ---------- Forms ---------- */
+  /* ---------- Formulários ---------- */
   .form {
     @apply flex flex-col gap-4;
   }
@@ -208,6 +212,9 @@
 
   .field {
     @apply flex flex-col gap-1.5;
+  }
+  .search {
+    @apply w-full sm:max-w-sm;
   }
 
   .label {
@@ -226,17 +233,17 @@
     @apply text-xs font-medium text-red-600;
   }
 
-  /* ---------- Modal sections ---------- */
+  /* ---------- Seções e listas dentro dos modais ---------- */
   .section {
-    @apply flex flex-col gap-3;
+    @apply flex flex-col gap-3 mt-3;
   }
 
   .section__header {
-    @apply flex items-center justify-between gap-3;
+    @apply flex items-center justify-end;
   }
 
   .section__title {
-    @apply text-sm font-semibold uppercase tracking-wide text-slate-500 pt-5;
+    @apply text-sm font-semibold uppercase tracking-wide text-slate-500;
   }
 
   .items-list {
@@ -255,7 +262,7 @@
     @apply whitespace-pre-line text-sm leading-relaxed text-slate-700;
   }
 
-  /* ---------- Tech data sheet view modal ---------- */
+  /* ---------- Resumo da ficha técnica ---------- */
   .summary {
     @apply grid grid-cols-2 gap-4 rounded-lg bg-slate-50 p-4;
   }
@@ -268,7 +275,7 @@
     @apply mt-1 text-lg font-bold text-slate-900;
   }
 
-  /* ---------- Table ---------- */
+  /* ---------- Tabela ---------- */
   .table-wrapper {
     @apply overflow-x-auto rounded-lg border border-slate-200;
   }
@@ -315,49 +322,154 @@
   }
 
   .modal__close {
-    @apply cursor-pointer rounded-md px-2 py-1 text-xl leading-none text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900;
+    @apply cursor-pointer rounded-md px-2 py-1 text-xl leading-none text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900  disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .modal__body {
-    @apply flex flex-col gap-4 overflow-y-auto px-6 py-5;
+    @apply flex flex-col gap-4 overflow-y-auto px-6 py-2;
   }
 
   .modal__footer {
-    @apply mt-2 flex justify-end gap-2 border-t border-slate-200 pt-4;
+    @apply mt-2 flex flex-wrap justify-end gap-2 border-t border-slate-200 pt-4;
+  }
+
+  /* ---------- Combobox ---------- */
+  .combobox {
+    @apply relative;
+  }
+
+  .combobox__list {
+    @apply absolute left-0 right-0 top-full z-10 mt-1 max-h-60 overflow-y-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg;
+  }
+
+  .combobox__option {
+    @apply flex cursor-pointer items-center justify-between gap-3 px-3 py-2 text-sm text-slate-700;
+  }
+
+  .combobox__option--active {
+    @apply bg-orange-50 text-orange-700;
+  }
+
+  .combobox__meta {
+    @apply shrink-0 text-xs text-slate-500;
+  }
+
+  .combobox__empty {
+    @apply px-3 py-2 text-sm text-slate-500;
+  }
+
+  /* ---------- Títulos de impressão ---------- */
+  .print-title {
+    @apply mb-4 text-2xl font-bold text-slate-900;
+  }
+
+  .print-only {
+    @apply hidden mb-4 text-2xl font-bold text-slate-900;
+  }
+
+  .print-all-area {
+    @apply mb-5;
+  }
+
+  /* ---------- 404 not found ---------- */
+  .not-found {
+    @apply flex min-h-screen flex-col items-center justify-center gap-6 bg-white px-4;
+  }
+
+  .not-found__title {
+    @apply text-center text-4xl font-bold text-black;
+  }
+
+  .not-found__button {
+    @apply rounded-lg bg-orange-600 px-6 py-3 font-semibold text-white transition-colors duration-200 hover:bg-orange-700;
   }
 }
 
-/* ---------- Print to PDF ---------- */
-
 @media print {
-  body * {
-    visibility: hidden !important;
+  @page {
+    size: A4;
+    margin: 15mm;
   }
 
-  .print-area,
-  .print-area * {
-    visibility: visible !important;
+  body:has(.modal-overlay) #root {
+    display: none !important;
   }
 
+  body {
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  .modal-overlay {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .modal-overlay:has(~ .modal-overlay) {
+    display: none !important;
+  }
+
+  .modal {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .modal__header,
+  .modal__footer {
+    display: none !important;
+  }
+
+  .modal__body {
+    display: block !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-all-area + .print-all-area {
+    break-before: page;
+  }
+
+  .print-all-area,
   .print-area {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    padding: 20px;
-    background: white;
+    width: 100% !important;
+    overflow: visible !important;
     color: black;
-    overflow: visible;
+    background: white;
   }
 
+  .print-all-area table,
   .print-area table {
     width: 100%;
     border-collapse: collapse;
   }
 
+  .print-all-area thead,
+  .print-area thead {
+    display: table-header-group;
+  }
+
+  .print-all-area tr,
   .print-area tr {
     break-inside: avoid;
   }
 
+  .print-all-area th,
+  .print-all-area td,
   .print-area th,
   .print-area td {
     border: 1px solid #ccc;
@@ -365,16 +477,18 @@
     text-align: left;
   }
 
+  .print-all-area .table__num,
   .print-area .table__num {
     text-align: right;
   }
 
+  .print-all-area .section,
   .print-area .section {
     break-inside: avoid;
   }
 
-  @page {
-    size: A4;
-    margin: 15mm;
+  .print-all-area .summary {
+    border: 1px solid #ccc;
+    background: none;
   }
 }

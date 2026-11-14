@@ -1,16 +1,17 @@
 import type { Product } from "./productType";
-
+import type { TechDataSheetCategoryOption } from "../constants/techDataSheetCategoryOptions";
+import type { UnitOption } from "../constants/unitOptions";
 // ---------- Server types ----------
 export type TechDataSheet = {
   id: string;
   companyId: string;
   name: string;
   yield: number;
-  yieldUnity: string;
+  yieldUnit: UnitOption;
   creationDate: string;
   lastRevision: string;
   prepTime: number;
-  category: string;
+  category: TechDataSheetCategoryOption;
   obs: string;
 };
 
@@ -21,25 +22,29 @@ export type TechDataSheetItem = {
   quantity: number;
 };
 
-export type TechDataSheetItemWithProduct = TechDataSheetItem & {
-  product: Product;
-};
-
 // ---------- Forms types ----------
-export type TechDataSheetFormItem = {
-  id?: string;
+type TechDataSheetFormItem = {
+  id: string | undefined;
   productId: string;
   quantity: number | "";
+  rowKey: string;
 };
 
 export type TechDataSheetFormValues = Omit<
   TechDataSheet,
-  "id" | "yield" | "creationDate" | "lastRevision" | "prepTime"
+  | "id"
+  | "yield"
+  | "creationDate"
+  | "lastRevision"
+  | "prepTime"
+  | "category"
+  | "yieldUnit"
 > & {
   yield: number | "";
+  yieldUnit: UnitOption | "";
   prepTime: number | "";
-  category: string;
   products: TechDataSheetFormItem[];
+  category: TechDataSheetCategoryOption | "";
 };
 
 // ---------- Send API types ----------
@@ -53,17 +58,11 @@ export type EditedTechDataSheetItem = NewTechDataSheetItem & {
 };
 
 export type NewTechDataSheet = Omit<TechDataSheet, "id"> & {
-  prepTime: number;
-  category: string;
-  creationDate: string;
-  lastRevision: string;
   products: NewTechDataSheetItem[];
 };
 
 export type EditedTechDataSheet = Omit<NewTechDataSheet, "products"> & {
   id: string;
-  creationDate: string;
-  lastRevision: string;
   products: EditedTechDataSheetItem[];
 };
 
@@ -97,3 +96,13 @@ export type TechDataSheetModalState =
   | { mode: "create" }
   | { mode: "edit"; dataSheet: TechDataSheet }
   | { mode: "view"; dataSheet: TechDataSheet };
+
+// ---------- Component and hook types ----------
+export type TechDataSheetItemWithProduct = TechDataSheetItem & {
+  product: Product;
+};
+
+export type TechDataSheetWithItems = {
+  techDataSheet: TechDataSheet;
+  itemsDetails: TechDataSheetItemWithProduct[];
+};

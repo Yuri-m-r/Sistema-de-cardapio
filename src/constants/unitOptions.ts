@@ -6,4 +6,6 @@ export const unitOptions = [
   { value: "CX", label: "Caixa" },
   { value: "PCT", label: "Pacote" },
   { value: "UN", label: "Unidade" },
-];
+] as const;
+
+export type UnitOption = (typeof unitOptions)[number]["value"];

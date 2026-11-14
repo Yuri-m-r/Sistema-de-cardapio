@@ -1,10 +1,9 @@
 import { NavLink } from "react-router-dom";
 import { navLinks } from "../constants/navLinks";
-
 const getLinkClass = ({ isActive }: { isActive: boolean }) =>
   isActive ? "nav-link nav-link--active" : "nav-link";
 
-const NavPages = () => {
+export const NavPages = () => {
   return (
     <header className="app-header">
       <div className="app-header__inner">
@@ -23,5 +22,3 @@ const NavPages = () => {
     </header>
   );
 };
-
-export default NavPages;

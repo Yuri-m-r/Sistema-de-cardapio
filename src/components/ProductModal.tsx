@@ -1,15 +1,21 @@
+// ------------- Import react -------------
 import { useState } from "react";
-import { createProduct, updateProduct } from "../api/productsApi";
+// ------------- Import types -------------
 import type {
   ProductModalProps,
   NewProduct,
   ProductFormValues,
 } from "../types/productType";
-import { validationProductSchema } from "../validation/productSchema";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import { unitOptions } from "../constants/unitOptions";
-import { productCategoryOption } from "../constants/productCategoryOption";
+// ------------- Import components/hooks/utils -------------
 import { Modal } from "./Modal";
+// ------------- Import formik -------------
+import { validationProductSchema } from "../validation/productsSchema";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+// ------------- Import constants -------------
+import { unitOptions } from "../constants/unitOptions";
+import { productCategoryOptions } from "../constants/productCategoryOptions";
+// ------------- Import api -------------
+import { createProduct, updateProduct } from "../api/productApi";
 
 export const ProductModal = ({
   onClose,
@@ -17,8 +23,9 @@ export const ProductModal = ({
   product,
   mode,
 }: ProductModalProps) => {
+  // ------------- State -------------
   const [submitError, setSubmitError] = useState<string | null>(null);
-
+  const [isBusy, setIsBusy] = useState(false);
   // ------------- Initial values -------------
   const initialValues: ProductFormValues =
     mode === "create"
@@ -33,18 +40,29 @@ export const ProductModal = ({
 
   // ------------- Handle submit -------------
   const handleSubmit = async (values: ProductFormValues) => {
+    if (!values.unit) {
+      setSubmitError("Selecione uma unidade válida");
+      return;
+    } else if (!values.category) {
+      setSubmitError("Selecione uma categoria válida");
+      return;
+    }
+
+    setIsBusy(true);
     setSubmitError(null);
 
     const data: NewProduct = {
       ...values,
       name: values.name.trim(),
-      unit: values.unit.trim(),
+      unit: values.unit,
+      category: values.category,
       cost: Number(values.cost),
     };
-
+    // ------------- Create product -------------
     try {
       if (mode === "create") {
         onSaved(await createProduct(data));
+        // ------------- Update product -------------
       } else {
         onSaved(await updateProduct({ ...data, id: product.id }));
       }
@@ -52,8 +70,12 @@ export const ProductModal = ({
     } catch (error) {
       console.error(error);
       setSubmitError(
-        mode === "create" ? "Erro ao cadastrar item" : "Erro ao atualizar item",
+        mode === "create"
+          ? "Erro ao cadastrar produto"
+          : "Erro ao atualizar produto",
       );
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -62,7 +84,9 @@ export const ProductModal = ({
     <Modal
       title={mode === "create" ? "Cadastrar produto" : "Editar produto"}
       onClose={onClose}
+      isBusy={isBusy}
     >
+      {/* ------------- Show status messages ------------- */}
       {submitError && (
         <p role="alert" className="alert alert--error">
           {submitError}
@@ -76,6 +100,7 @@ export const ProductModal = ({
       >
         {({ isSubmitting, dirty }) => (
           <Form className="form">
+            {/* ------------- Fields ------------- */}
             <div className="field">
               <label htmlFor="name" className="label">
                 Nome
@@ -103,28 +128,44 @@ export const ProductModal = ({
               <label htmlFor="cost" className="label">
                 Custo
               </label>
-              <Field name="cost" id="cost" type="number" className="input" />
+              <Field
+                name="cost"
+                id="cost"
+                type="number"
+                className="input"
+                step="0.01"
+              />
               <ErrorMessage name="cost" component="p" className="field-error" />
             </div>
-             <div className="field">
+            <div className="field">
               <label htmlFor="category" className="label">
                 Categoria
               </label>
-              <Field as="select" name="category" id="category" className="input">
+              <Field
+                as="select"
+                name="category"
+                id="category"
+                className="input"
+              >
                 <option value="">Selecione uma categoria</option>
-                {productCategoryOption.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
+                {productCategoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
                   </option>
                 ))}
               </Field>
-              <ErrorMessage name="unit" component="p" className="field-error" />
+              <ErrorMessage
+                name="category"
+                component="p"
+                className="field-error"
+              />
             </div>
-
+            {/* ------------- Footer buttons ------------- */}
             <div className="modal__footer">
               <button
                 type="button"
                 className="btn btn--secondary"
+                disabled={isBusy}
                 onClick={() => onClose()}
               >
                 Cancelar
